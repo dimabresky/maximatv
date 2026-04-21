@@ -42,15 +42,9 @@ if (count($arResult['ITEMS']) > 0) {
     if (!empty($mainItem['PROPERTIES']['PATH_TO_VIDEO']['VALUE'])) {
         $currentVideoIndex = (int)Application::getInstance()->getContext()->getRequest()->get('VNUM');
         $videoPath = /*'/upload/yadisk' . */$mainItem['PROPERTIES']['PATH_TO_VIDEO']['VALUE'];
-        $arFileNames = scandir($_SERVER['DOCUMENT_ROOT'] . $videoPath, SCANDIR_SORT_ASCENDING);
-        if ($arFileNames !== false) {
-            foreach ($arFileNames as $fileName) {
-                if (in_array($fileName, ['.', '..'])) {
-                    continue;
-                }
-                $arFiles[] = $videoPath . $fileName;
-            }
-            $videoFile = $arFiles[$currentVideoIndex];
+        $arFiles = VideoQualityHelper::listRegularFilesInVideoDir($videoPath);
+        if ($arFiles !== []) {
+            $videoFile = $arFiles[$currentVideoIndex] ?? $arFiles[0];
         }
     }
     switch ($arResult['UF_DISCIPLINE']) {

@@ -5,7 +5,8 @@ namespace Maxima\Search;
 use Bitrix\Main\Loader;
 use Bitrix\Main\Localization\Loc;
 use Maxima\Search\Tables\SearchContentTable;
-use  Maxima\Helpers\CommonHelper;
+use Maxima\Helpers\CommonHelper;
+use Maxima\Helpers\VideoQualityHelper;
 use Bitrix\Main\Type;
 
 
@@ -185,18 +186,16 @@ class Reindex
         }
 
         foreach ($itemsList as $key => $arItem){
-            $arFileNames = scandir($_SERVER['DOCUMENT_ROOT'] . $arItem['PATH_TO_VIDEO'], SCANDIR_SORT_ASCENDING);
-            if ($arFileNames !== false) {
+            $videoPaths = VideoQualityHelper::listRegularFilesInVideoDir($arItem['PATH_TO_VIDEO']);
+            if ($videoPaths !== []) {
                 $arItem['SECTION_PAGE_URL'] = $sectionList[$arItem['IBLOCK_SECTION_ID']]['SECTION_PAGE_URL'];
                 $dateFrom = false;
                 if($sectionList[$arItem['IBLOCK_SECTION_ID']]['UF_DATE']){
                     $dateFrom = $sectionList[$arItem['IBLOCK_SECTION_ID']]['UF_DATE'];
                 }
                 $arItem['FILES'] = [];
-                foreach ($arFileNames as $fileName) {
-                    if (in_array($fileName, ['.', '..'])) {
-                        continue;
-                    }
+                foreach ($videoPaths as $videoWebPath) {
+                    $fileName = basename($videoWebPath);
                     $fileName = mb_convert_encoding($fileName, "utf-8","windows-1251");
                     $arItem['FILES'][] = [
                         'ORIGIN_NAME' => $fileName,

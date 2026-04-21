@@ -80,6 +80,36 @@ class VideoQualityHelper
         return $out;
     }
 
+    /**
+     * Lists only regular files in a PATH_TO_VIDEO directory (excludes subdirectories such as `ext/`).
+     *
+     * @return list<string> Paths in the form used by templates: $videoPath . $fileName
+     */
+    public static function listRegularFilesInVideoDir(string $videoPath): array
+    {
+        $documentRoot = $_SERVER['DOCUMENT_ROOT'] ?? '';
+        if ($documentRoot === '' || $videoPath === '') {
+            return [];
+        }
+        $dirAbs = $documentRoot . $videoPath;
+        $arFileNames = @scandir($dirAbs, SCANDIR_SORT_ASCENDING);
+        if ($arFileNames === false) {
+            return [];
+        }
+        $arFiles = [];
+        foreach ($arFileNames as $fileName) {
+            if ($fileName === '.' || $fileName === '..') {
+                continue;
+            }
+            if (!is_file($dirAbs . $fileName)) {
+                continue;
+            }
+            $arFiles[] = $videoPath . $fileName;
+        }
+
+        return $arFiles;
+    }
+
     public static function normalizeWebPath(string $path): string
     {
         $path = trim($path);
