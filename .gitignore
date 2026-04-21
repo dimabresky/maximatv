@@ -1,0 +1,53 @@
+# --- OS & editors ---
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+
+# --- NetBeans ---
+nbproject/private/
+nbproject/Makefile-*.mk
+nbproject/Package-*.bash
+
+# --- IDE (uncomment if you do not share team settings) ---
+# .idea/
+# .vscode/
+
+# --- Composer / PHP ---
+/vendor/
+composer.phar
+composer.lock.bak
+
+# --- Node (if used under local/ or tools) ---
+node_modules/
+npm-debug.log*
+yarn-error.log*
+package-lock.json.bak
+
+# --- Bitrix core (entire directory; deploy or copy separately) ---
+/bitrix/
+
+# --- Secrets & environment (outside bitrix if tracked) ---
+/.env
+/.env.*
+!/.env.example
+
+# --- User content ---
+/upload/
+
+# --- Logs & dumps ---
+*.log
+*.sql.gz
+*.dump
+*.bak
+# Root-level SQL dumps (uncomment if you keep versioned .sql under paths like /sql/)
+# /*.sql
+
+# --- Archives & installers (often dropped in web root) ---
+*.zip
+*.tar
+*.tar.gz
+*.rar
+restore.php
