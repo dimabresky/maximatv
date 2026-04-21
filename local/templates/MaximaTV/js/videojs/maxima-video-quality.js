@@ -57,7 +57,6 @@
       }
       options.title = options.title || 'Качество';
       MenuButton.call(this, player, options);
-      this.sources = options.sources || [];
     },
     createItems: function () {
       var player = this.player();
