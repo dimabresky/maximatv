@@ -91,7 +91,11 @@ class VideoQualityHelper
         if ($documentRoot === '' || $videoPath === '') {
             return [];
         }
-        $dirAbs = $documentRoot . $videoPath;
+        $webDir = rtrim(str_replace('\\', '/', self::normalizeWebPath($videoPath)), '/');
+        if ($webDir === '') {
+            return [];
+        }
+        $dirAbs = rtrim($documentRoot, '/\\') . $webDir;
         $arFileNames = @scandir($dirAbs, SCANDIR_SORT_ASCENDING);
         if ($arFileNames === false) {
             return [];
@@ -101,10 +105,11 @@ class VideoQualityHelper
             if ($fileName === '.' || $fileName === '..') {
                 continue;
             }
-            if (!is_file($dirAbs . $fileName)) {
+            $fullPath = $dirAbs . '/' . $fileName;
+            if (!is_file($fullPath)) {
                 continue;
             }
-            $arFiles[] = $videoPath . $fileName;
+            $arFiles[] = $webDir . '/' . $fileName;
         }
 
         return $arFiles;
