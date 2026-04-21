@@ -8,10 +8,6 @@
     return;
   }
 
-  if (videojs.options) {
-    videojs.options.autoSetup = false;
-  }
-
   function getOrInitPlayerSwitchState(player) {
     if (!player._maximaQualityState) {
       player._maximaQualityState = { lastStableTime: 0, switchGen: 0 };
