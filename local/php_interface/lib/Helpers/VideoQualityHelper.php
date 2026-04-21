@@ -58,8 +58,16 @@ class VideoQualityHelper
             return self::comparePrefixForSort((string)$a['prefix'], (string)$b['prefix']);
         });
 
+        $sourceLabel = '1080p';
+        foreach ($variants as $v) {
+            if (($v['label'] ?? '') === '1080p') {
+                $sourceLabel = 'Оригинал';
+                break;
+            }
+        }
+
         $source = [
-            'label' => '1080p',
+            'label' => $sourceLabel,
             'src' => $webPath,
             'isSource' => true,
             'selected' => true,
