@@ -7,9 +7,7 @@ desktop.ini
 *~
 
 # --- NetBeans ---
-nbproject/private/
-nbproject/Makefile-*.mk
-nbproject/Package-*.bash
+/nbproject/
 
 # --- IDE (uncomment if you do not share team settings) ---
 # .idea/
