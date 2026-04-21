@@ -21,7 +21,7 @@ if ($defaultSrc === '' && isset($arVideoSources[0])) {
 
 ?>
 <script>
-window.__MaximaTVVideoSources = <?=json_encode($arVideoSources, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)?>;
+window.__MaximaTVVideoSources = <?=json_encode($arVideoSources, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG)?>;
 </script>
 <div class="event__video-preview">
     <video

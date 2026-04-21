@@ -12,11 +12,33 @@
     videojs.options.autoSetup = false;
   }
 
+  function getOrInitPlayerSwitchState(player) {
+    if (!player._maximaQualityState) {
+      player._maximaQualityState = { lastStableTime: 0, switchGen: 0 };
+      player.on('timeupdate', function () {
+        var c = player.currentTime();
+        if (!isNaN(c) && c > 0.25) {
+          player._maximaQualityState.lastStableTime = c;
+        }
+      });
+    }
+    return player._maximaQualityState;
+  }
+
   function switchSource(player, src) {
+    var state = getOrInitPlayerSwitchState(player);
     var t = player.currentTime();
+    if (t < 0.25 && state.lastStableTime > 0) {
+      t = state.lastStableTime;
+    }
     var wasPaused = player.paused();
+    state.switchGen += 1;
+    var gen = state.switchGen;
     player.src({ src: src.src, type: 'video/mp4' });
     player.one('loadedmetadata', function () {
+      if (gen !== state.switchGen) {
+        return;
+      }
       try {
         player.currentTime(t);
       } catch (e) {}
@@ -91,6 +113,8 @@
       });
 
     player.ready(function () {
+      getOrInitPlayerSwitchState(this);
+
       this.hotkeys({
         volumeStep: 0.1,
         seekStep: 5,
