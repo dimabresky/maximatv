@@ -27,12 +27,14 @@ class VideoQualityHelper
         $extDir = ($dir === '' ? '' : rtrim($dir, '/')) . '/ext';
         $documentRoot = $_SERVER['DOCUMENT_ROOT'] ?? '';
         $extFullPath = $documentRoot . $extDir;
+        $parentWebDir = $dir === '' ? '' : $dir;
+        $siblingBasenames = self::listSiblingBasenamesInParentDir($documentRoot, $parentWebDir);
 
         $variants = [];
         if ($documentRoot !== '' && is_dir($extFullPath) && is_readable($extFullPath)) {
             $names = scandir($extFullPath);
             if ($names !== false) {
-                $pattern = '/^(.+)_' . preg_quote($basename, '/') . '$/';
+                $patternFallback = '/^(.+)_' . preg_quote($basename, '/') . '$/';
                 foreach ($names as $fileName) {
                     if ($fileName === '.' || $fileName === '..') {
                         continue;
@@ -41,15 +43,25 @@ class VideoQualityHelper
                     if (!is_file($fullFile)) {
                         continue;
                     }
-                    if (preg_match($pattern, $fileName, $m)) {
-                        $prefix = $m[1];
-                        $variants[] = [
-                            'prefix' => $prefix,
-                            'label' => self::formatQualityLabel($prefix),
-                            'src' => $extDir . '/' . $fileName,
-                            'isSource' => false,
-                        ];
+                    $ownerBasename = self::findOwnerBasenameForExtFile($fileName, $siblingBasenames, $patternFallback, $basename);
+                    if ($ownerBasename === null || $ownerBasename !== $basename) {
+                        continue;
                     }
+                    $suffix = '_' . $ownerBasename;
+                    $sufLen = strlen($suffix);
+                    if (strlen($fileName) <= $sufLen) {
+                        continue;
+                    }
+                    $prefix = substr($fileName, 0, -$sufLen);
+                    if ($prefix === '') {
+                        continue;
+                    }
+                    $variants[] = [
+                        'prefix' => $prefix,
+                        'label' => self::formatQualityLabel($prefix),
+                        'src' => $extDir . '/' . $fileName,
+                        'isSource' => false,
+                    ];
                 }
             }
         }
@@ -134,6 +146,71 @@ class VideoQualityHelper
         }
 
         return $path;
+    }
+
+    /**
+     * Basenames of regular files in the same web directory as the main video (excludes subdirectories like `ext/`).
+     *
+     * @return list<string>
+     */
+    private static function listSiblingBasenamesInParentDir(string $documentRoot, string $parentWebDir): array
+    {
+        if ($documentRoot === '') {
+            return [];
+        }
+        $dirAbs = rtrim($documentRoot, "/\\") . $parentWebDir;
+        if (!is_dir($dirAbs) || !is_readable($dirAbs)) {
+            return [];
+        }
+        $names = @scandir($dirAbs);
+        if ($names === false) {
+            return [];
+        }
+        $out = [];
+        foreach ($names as $n) {
+            if ($n === '.' || $n === '..') {
+                continue;
+            }
+            if (!is_file($dirAbs . '/' . $n)) {
+                continue;
+            }
+            $out[] = $n;
+        }
+
+        return $out;
+    }
+
+    /**
+     * Resolves which sibling video basename an ext/ file belongs to (longest matching suffix wins).
+     */
+    private static function findOwnerBasenameForExtFile(
+        string $fileName,
+        array $siblingBasenames,
+        string $patternFallback,
+        string $basename
+    ): ?string {
+        if ($siblingBasenames !== []) {
+            $best = null;
+            $bestLen = 0;
+            foreach ($siblingBasenames as $sib) {
+                $suf = '_' . $sib;
+                $ll = strlen($suf);
+                if (strlen($fileName) <= $ll) {
+                    continue;
+                }
+                if (substr($fileName, -$ll) === $suf && strlen($sib) > $bestLen) {
+                    $bestLen = strlen($sib);
+                    $best = $sib;
+                }
+            }
+
+            return $best;
+        }
+        if (preg_match($patternFallback, $fileName)) {
+            return $basename;
+        }
+
+        return null;
     }
 
     private static function formatQualityLabel(string $prefix): string
