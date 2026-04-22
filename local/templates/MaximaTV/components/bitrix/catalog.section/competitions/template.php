@@ -13,6 +13,7 @@ use Maxima\Helpers\CommonHelper;
  */
 
 use Maxima\Helpers\FavoritesHelper;
+use Maxima\Helpers\VideoQualityHelper;
 
 global $APPLICATION, $USER;
 
@@ -20,6 +21,7 @@ $this->setFrameMode(true);
 
 $this->addExternalCss("/local/templates/MaximaTV/css/videojs/video-js.css");
 $this->addExternalJS("/local/templates/MaximaTV/js/videojs/video.js");
+$this->addExternalJS("/local/templates/MaximaTV/js/videojs/maxima-video-quality.js");
 $this->addExternalJS("/local/templates/MaximaTV/js/videojs/videojs.hotkeys.min.js");
 
 if (count($arResult['ITEMS']) > 0) {
@@ -40,15 +42,9 @@ if (count($arResult['ITEMS']) > 0) {
     if (!empty($mainItem['PROPERTIES']['PATH_TO_VIDEO']['VALUE'])) {
         $currentVideoIndex = (int)Application::getInstance()->getContext()->getRequest()->get('VNUM');
         $videoPath = /*'/upload/yadisk' . */$mainItem['PROPERTIES']['PATH_TO_VIDEO']['VALUE'];
-        $arFileNames = scandir($_SERVER['DOCUMENT_ROOT'] . $videoPath, SCANDIR_SORT_ASCENDING);
-        if ($arFileNames !== false) {
-            foreach ($arFileNames as $fileName) {
-                if (in_array($fileName, ['.', '..'])) {
-                    continue;
-                }
-                $arFiles[] = $videoPath . $fileName;
-            }
-            $videoFile = $arFiles[$currentVideoIndex];
+        $arFiles = VideoQualityHelper::listRegularFilesInVideoDir($videoPath);
+        if ($arFiles !== []) {
+            $videoFile = $arFiles[$currentVideoIndex] ?? $arFiles[0];
         }
     }
     switch ($arResult['UF_DISCIPLINE']) {
@@ -140,36 +136,11 @@ if (count($arResult['ITEMS']) > 0) {
                                     >
                                 </div>
                                 <?php } else { ?>
-                                    <div class="event__video-preview">
-                                        <video
-                                            id="MaximaTV-video"
-                                            class="video-js"
-                                            controls
-                                            preload="auto"
-                                            poster="<?=$preview['src']?>"
-                                            data-setup='{"fluid": true}'
-                                        >
-                                            <source src="<?=$videoFile?>" />
-                                            <p class="vjs-no-js">
-                                                To view this video please enable JavaScript, and consider upgrading to a
-                                                web browser that supports HTML5 video
-                                            </p>
-                                        </video>
-                                    </div>
-                                    <script>
-                                        $(document).ready(function() {
-                                            videojs('MaximaTV-video').ready(function() {
-                                                this.hotkeys({
-                                                    volumeStep: 0.1,
-                                                    seekStep: 5,
-                                                    enableModifiersForNumbers: false
-                                                });
-                                            });
-                                            $('.event__video video').on('contextmenu', function() {
-                                                return false;
-                                            });
-                                        });
-                                    </script>
+                                    <?php
+                                    $arVideoSources = VideoQualityHelper::getSourcesForWebPath((string)$videoFile);
+                                    $previewSrc = $preview['src'];
+                                    include $_SERVER['DOCUMENT_ROOT'] . '/local/templates/MaximaTV/include/maxima_video_player.php';
+                                    ?>
                                 <?php } ?>
                             <?php } else { ?>
                                 <?php

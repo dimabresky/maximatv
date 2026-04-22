@@ -12,11 +12,13 @@
 /** @var CBitrixComponent $component */
 
 use Maxima\Helpers\FavoritesHelper;
+use Maxima\Helpers\VideoQualityHelper;
 
 $this->setFrameMode(true);
 
 $this->addExternalCss("/local/templates/MaximaTV/css/videojs/video-js.css");
 $this->addExternalJS("/local/templates/MaximaTV/js/videojs/video.js");
+$this->addExternalJS("/local/templates/MaximaTV/js/videojs/maxima-video-quality.js");
 $this->addExternalJS("/local/templates/MaximaTV/js/videojs/videojs.hotkeys.min.js");
 ?>
 <?php
@@ -87,36 +89,13 @@ $this->addExternalJS("/local/templates/MaximaTV/js/videojs/videojs.hotkeys.min.j
                                     autoplay="autoplay"
                                     width="100%" height="100%"
                             */?>
-                            <div class="event__video-preview">
-                                <video
-                                        id="MaximaTV-video"
-                                        class="video-js"
-                                        controls
-                                        preload="auto"
-                                        poster="<?=$preview['src']?>"
-                                        data-setup='{"fluid": true}'
-                                >
-                                    <source src="<?=$arResult['PROPERTIES']['VIDEO_FILE']['VALUE']?>" />
-                                    <p class="vjs-no-js">
-                                        To view this video please enable JavaScript, and consider upgrading to a
-                                        web browser that supports HTML5 video
-                                    </p>
-                                </video>
-                            </div>
-                            <script>
-                                $(document).ready(function() {
-                                    videojs('MaximaTV-video').ready(function() {
-                                        this.hotkeys({
-                                            volumeStep: 0.1,
-                                            seekStep: 5,
-                                            enableModifiersForNumbers: false
-                                        });
-                                    });
-                                    $('.event__video video').on('contextmenu', function() {
-                                        return false;
-                                    });
-                                });
-                            </script>
+                            <?php
+                            $arVideoSources = VideoQualityHelper::getSourcesForWebPath(
+                                (string)$arResult['PROPERTIES']['VIDEO_FILE']['VALUE']
+                            );
+                            $previewSrc = $preview['src'];
+                            include $_SERVER['DOCUMENT_ROOT'] . '/local/templates/MaximaTV/include/maxima_video_player.php';
+                            ?>
                         <?php } else { ?>
                             <div class="event__video-preview" style="background-image:url(<?=$preview['src']?>)"></div>
                         <?php } ?>
