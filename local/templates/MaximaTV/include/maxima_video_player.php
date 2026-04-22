@@ -37,6 +37,7 @@ window.__MaximaTVVideoSources = <?=$maximaVideoSourcesJson?>;
         class="video-js"
         controls
         preload="auto"
+        data-setup='{"fluid": true}'
         poster="<?=htmlspecialchars($previewSrc, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')?>"
     >
         <source src="<?=htmlspecialchars($defaultSrc, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')?>" type="video/mp4"/>
