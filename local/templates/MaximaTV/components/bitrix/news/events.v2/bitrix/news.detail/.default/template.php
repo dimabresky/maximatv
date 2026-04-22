@@ -95,7 +95,7 @@ $this->addExternalJS("/local/templates/MaximaTV/js/videojs/videojs.hotkeys.min.j
                                 (string)$arResult['PROPERTIES']['VIDEO_FILE']['VALUE']
                             );
                             $previewSrc = $preview['src'];
-                            include SITE_TEMPLATE_PATH . '/include/maxima_video_player.php';
+                            include $_SERVER['DOCUMENT_ROOT'] . SITE_TEMPLATE_PATH . '/include/maxima_video_player.php';
                             ?>
                         <?php } else { ?>
                             <div class="event__video-preview" style="background-image:url(<?=$preview['src']?>)"></div>

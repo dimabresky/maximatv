@@ -140,7 +140,7 @@ if (count($arResult['ITEMS']) > 0) {
                                     <?php
                                     $arVideoSources = VideoQualityHelper::getSourcesForWebPath((string)$videoFile);
                                     $previewSrc = $preview['src'];
-                                    include SITE_TEMPLATE_PATH . '/include/maxima_video_player.php';
+                                    include $_SERVER['DOCUMENT_ROOT'] . SITE_TEMPLATE_PATH . '/include/maxima_video_player.php';
                                     ?>
                                 <?php } ?>
                             <?php } else { ?>
