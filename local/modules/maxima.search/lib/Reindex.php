@@ -196,7 +196,6 @@ class Reindex
                 $arItem['FILES'] = [];
                 foreach ($videoPaths as $videoWebPath) {
                     $fileName = basename($videoWebPath);
-                    $fileName = mb_convert_encoding($fileName, "utf-8","windows-1251");
                     $arItem['FILES'][] = [
                         'ORIGIN_NAME' => $fileName,
                         'NAME' => CommonHelper::translitFileNameBack(pathinfo($fileName)['filename'])

@@ -19,9 +19,17 @@ if ($defaultSrc === '' && isset($arVideoSources[0])) {
     $defaultSrc = $arVideoSources[0]['src'];
 }
 
+$maximaVideoSourcesJson = json_encode(
+    $arVideoSources,
+    JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG
+);
+if ($maximaVideoSourcesJson === false) {
+    $maximaVideoSourcesJson = '[]';
+}
+
 ?>
 <script>
-window.__MaximaTVVideoSources = <?=json_encode($arVideoSources, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG)?>;
+window.__MaximaTVVideoSources = <?=$maximaVideoSourcesJson?>;
 </script>
 <div class="event__video-preview">
     <video
@@ -29,9 +37,9 @@ window.__MaximaTVVideoSources = <?=json_encode($arVideoSources, JSON_UNESCAPED_U
         class="video-js"
         controls
         preload="auto"
-        poster="<?=htmlspecialchars($previewSrc, ENT_QUOTES, 'UTF-8')?>"
+        poster="<?=htmlspecialchars($previewSrc, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')?>"
     >
-        <source src="<?=htmlspecialchars($defaultSrc, ENT_QUOTES, 'UTF-8')?>" type="video/mp4"/>
+        <source src="<?=htmlspecialchars($defaultSrc, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')?>" type="video/mp4"/>
         <p class="vjs-no-js">
             To view this video please enable JavaScript, and consider upgrading to a
             web browser that supports HTML5 video

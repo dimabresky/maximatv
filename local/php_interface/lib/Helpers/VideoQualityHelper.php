@@ -12,7 +12,7 @@ class VideoQualityHelper
      */
     public static function getSourcesForWebPath(string $webPath): array
     {
-        $webPath = self::normalizeWebPath($webPath);
+        $webPath = self::normalizeWebPathToUtf8($webPath);
         if ($webPath === '') {
             return [];
         }
@@ -43,23 +43,24 @@ class VideoQualityHelper
                     if (!is_file($fullFile)) {
                         continue;
                     }
-                    $ownerBasename = self::findOwnerBasenameForExtFile($fileName, $siblingBasenames, $patternFallback, $basename);
+                    $utf8FileName = self::fileSystemNameToUtf8($fileName);
+                    $ownerBasename = self::findOwnerBasenameForExtFile($utf8FileName, $siblingBasenames, $patternFallback, $basename);
                     if ($ownerBasename === null || $ownerBasename !== $basename) {
                         continue;
                     }
                     $suffix = '_' . $ownerBasename;
                     $sufLen = strlen($suffix);
-                    if (strlen($fileName) <= $sufLen) {
+                    if (strlen($utf8FileName) <= $sufLen) {
                         continue;
                     }
-                    $prefix = substr($fileName, 0, -$sufLen);
+                    $prefix = substr($utf8FileName, 0, -$sufLen);
                     if ($prefix === '') {
                         continue;
                     }
                     $variants[] = [
                         'prefix' => $prefix,
                         'label' => self::formatQualityLabel($prefix),
-                        'src' => $extDir . '/' . $fileName,
+                        'src' => $extDir . '/' . $utf8FileName,
                         'isSource' => false,
                     ];
                 }
@@ -129,7 +130,7 @@ class VideoQualityHelper
             if (!is_file($fullPath)) {
                 continue;
             }
-            $arFiles[] = $webDir . '/' . $fileName;
+            $arFiles[] = $webDir . '/' . self::fileSystemNameToUtf8($fileName);
         }
 
         return $arFiles;
@@ -146,6 +147,47 @@ class VideoQualityHelper
         }
 
         return $path;
+    }
+
+    /**
+     * Normalizes a web path so each segment is valid UTF-8 (filesystem names on Windows may be in Windows-1251).
+     */
+    public static function normalizeWebPathToUtf8(string $path): string
+    {
+        $path = self::normalizeWebPath($path);
+        if ($path === '' || $path === '/') {
+            return $path;
+        }
+        $trim = trim($path, '/');
+        if ($trim === '') {
+            return '/';
+        }
+        $parts = array_values(
+            array_map(
+                [self::class, 'fileSystemNameToUtf8'],
+                array_filter(explode('/', $trim))
+            )
+        );
+
+        return '/' . implode('/', $parts);
+    }
+
+    /**
+     * Interprets a single path component from scandir/FS as UTF-8 (tries Windows-1251 if not already UTF-8).
+     */
+    public static function fileSystemNameToUtf8(string $name): string
+    {
+        if ($name === '') {
+            return '';
+        }
+        if (function_exists('mb_check_encoding') && mb_check_encoding($name, 'UTF-8')) {
+            return $name;
+        }
+        if (function_exists('mb_convert_encoding')) {
+            return mb_convert_encoding($name, 'UTF-8', 'Windows-1251');
+        }
+
+        return $name;
     }
 
     /**
@@ -174,7 +216,7 @@ class VideoQualityHelper
             if (!is_file($dirAbs . '/' . $n)) {
                 continue;
             }
-            $out[] = $n;
+            $out[] = self::fileSystemNameToUtf8($n);
         }
 
         return $out;
