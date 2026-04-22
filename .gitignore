@@ -49,3 +49,5 @@ package-lock.json.bak
 *.tar.gz
 *.rar
 restore.php
+
+/competitions/
