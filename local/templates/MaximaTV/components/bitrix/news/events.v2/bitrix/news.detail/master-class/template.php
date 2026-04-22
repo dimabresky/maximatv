@@ -20,6 +20,7 @@ global $APPLICATION, $USER;
 $this->setFrameMode(true);
 
 $this->addExternalCss("/local/templates/MaximaTV/css/videojs/video-js.css");
+$this->addExternalCss("/local/templates/MaximaTV/css/videojs/maxima-video-quality.css");
 $this->addExternalJS("/local/templates/MaximaTV/js/videojs/video.js");
 $this->addExternalJS("/local/templates/MaximaTV/js/videojs/maxima-video-quality.js");
 $this->addExternalJS("/local/templates/MaximaTV/js/videojs/videojs.hotkeys.min.js");
@@ -120,7 +121,7 @@ $curUser = $USER->GetId();
                             <?php
                             $arVideoSources = VideoQualityHelper::getSourcesForWebPath((string)$videoFile);
                             $previewSrc = $preview['src'];
-                            include $_SERVER['DOCUMENT_ROOT'] . '/local/templates/MaximaTV/include/maxima_video_player.php';
+                            include $_SERVER['DOCUMENT_ROOT'] . SITE_TEMPLATE_PATH . '/include/maxima_video_player.php';
                             ?>
                         <?php } ?>
                         <?php } else { ?>

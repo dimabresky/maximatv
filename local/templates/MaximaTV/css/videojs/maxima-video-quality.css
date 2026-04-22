@@ -1,0 +1,7 @@
+/* Video.js quality menu: icon on control bar (VideoJS icon font from video-js.css) */
+.video-js .vjs-maxima-quality-button .vjs-icon-placeholder:before {
+  font-family: VideoJS;
+  font-weight: normal;
+  font-style: normal;
+  content: "\f114";
+}

@@ -58,6 +58,17 @@
       options.title = options.title || 'Качество';
       MenuButton.call(this, player, options);
     },
+    buildCSSClass: function () {
+      return (
+        'vjs-maxima-quality-button ' + MenuButton.prototype.buildCSSClass.call(this)
+      );
+    },
+    buildWrapperCSSClass: function () {
+      return (
+        'vjs-maxima-quality-button ' +
+        MenuButton.prototype.buildWrapperCSSClass.call(this)
+      );
+    },
     createItems: function () {
       var player = this.player();
       var sources = this.options_.sources || [];
