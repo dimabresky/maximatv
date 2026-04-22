@@ -17,6 +17,7 @@ use Maxima\Helpers\VideoQualityHelper;
 $this->setFrameMode(true);
 
 $this->addExternalCss("/local/templates/MaximaTV/css/videojs/video-js.css");
+$this->addExternalCss("/local/templates/MaximaTV/css/videojs/maxima-video-quality.css");
 $this->addExternalJS("/local/templates/MaximaTV/js/videojs/video.js");
 $this->addExternalJS("/local/templates/MaximaTV/js/videojs/maxima-video-quality.js");
 $this->addExternalJS("/local/templates/MaximaTV/js/videojs/videojs.hotkeys.min.js");
@@ -94,7 +95,7 @@ $this->addExternalJS("/local/templates/MaximaTV/js/videojs/videojs.hotkeys.min.j
                                 (string)$arResult['PROPERTIES']['VIDEO_FILE']['VALUE']
                             );
                             $previewSrc = $preview['src'];
-                            include $_SERVER['DOCUMENT_ROOT'] . '/local/templates/MaximaTV/include/maxima_video_player.php';
+                            include SITE_TEMPLATE_PATH . '/include/maxima_video_player.php';
                             ?>
                         <?php } else { ?>
                             <div class="event__video-preview" style="background-image:url(<?=$preview['src']?>)"></div>
